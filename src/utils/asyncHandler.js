@@ -7,7 +7,7 @@ const asyncHandler=(requestHandler) => {
 export {asyncHandler} 
 
 
-// const asyncHandler = ()=>{}
+// const asyncHandler = ()=>{} 
 // const asyncHandler = (fun)=>()=>{}
 // const asyncHandler = (fun)=>async ()=>{}
 
