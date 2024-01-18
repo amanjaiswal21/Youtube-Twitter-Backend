@@ -61,17 +61,20 @@ this.password =await bcrypt.hash(this.password,10);
 next();
 })
 
+
+
 userSchema.methods.isPasswordCorrect=async function(password){
     return  await bcrypt.compareSync(password,this.password);
 }
 
+//jwt is a bearer token
 userSchema.methods.generateAccessToken=function(){
   return  jwt.sign(
     {
         _id: this._id,
         email: this.email,
         username: this.username,
-        fullName: this.fullName
+        fullName: this.fullName 
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
@@ -93,4 +96,4 @@ userSchema.methods.generateRefreshToken=function(){
 }
 
 const User=mongoose.model("User",userSchema);
-export default User;
+export  {User};
