@@ -269,13 +269,13 @@ const updateAvatar=asyncHandler(async(req, res)=>{
     throw new ApiError(401,"Avatar fill missing ")
    }
 
-   const avatar=uploadOnCloudinary(avatarLocalPath)
+   const avatar=await uploadOnCloudinary(avatarLocalPath)
 
    if(!avatar.url){
     throw new ApiError(401,"Error while uploading avatar on cloudinary")
    }
 
-   await User.findByIdAndUpdate(req.user?._id,{
+  const user= await User.findByIdAndUpdate(req.user?._id,{
       $set:{
         avatar:avatar.url
       }
@@ -283,7 +283,35 @@ const updateAvatar=asyncHandler(async(req, res)=>{
     new:true
    }).select("-password")
 
+   return res
+            .status(200)
+            .json(new ApiResponse(200,user," avatar updated successfully"))
 })
+
+const updateUserCoverImage=asyncHandler(async(req, res)=>{
+    const avatarCoverImageLocalPath=req.file?.path;
+    if(!avatarLocalPath){
+     throw new ApiError(401,"cover image file missing ")
+    }
+ 
+    const coverImage= await uploadOnCloudinary(avatarCoverImageLocalPath)
+ 
+    if(!coverImage.url){
+     throw new ApiError(401,"Error while uploading cover image on cloudinary")
+    }
+ 
+    const user=await User.findByIdAndUpdate(req.user?._id,{
+       $set:{
+         coverImage:coverImage.url
+       }
+    },{
+     new:true
+    }).select("-password")
+
+    return res
+            .status(200)
+            .json(new ApiResponse(200,user,"Cover image updated successfully"))
+ })
 
 export {
     registerUser,
@@ -291,6 +319,9 @@ export {
     logoutUser,
     refreshAccessToken,
     channgeCurrentPassword,
-    updateAccountDetails
+    updateAccountDetails,
+    updateAvatar,
+    updateUserCoverImage,
+    refreshAccessToken,
     
 } 
