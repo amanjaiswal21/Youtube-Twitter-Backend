@@ -216,9 +216,81 @@ const refreshAccessToken=asyncHandler (async(req,res)=>{
 
 })
 
+const channgeCurrentPassword=asyncHandler(async(req,res)=>{
+    const{oldPassword,newPassword}=req.body
+    const user=await User.findById(req.user._id)
+   const isPasswordCorrect=await user.isPasswordCorrect(oldPassword)
+
+   if(!isPasswordCorrect){
+    throw new ApiError(401,"Invalid Old Password")
+   } 
+
+   user.password=newPassword
+   await user.save({validateBeforeSave:false})
+
+   return res
+          .status(200)
+          .json(new ApiResponse(200,{},"Password updated"))
+           
+
+})
+
+const getCurrentUser=asyncHandler(async(req, res)=>{
+   return res
+          .status(200)
+          .json(new ApiResponse(200,req.user,"current user fetched successfully")) 
+})
+
+
+const updateAccountDetails=asyncHandler(async(req, res)=>{
+    const {fullName,email}=req.body;
+
+    if(!(fullName || email)){
+        throw new ApiError(401,"All fields must be provided")
+    }
+    const user=User.findByIdAndUpdate(req.user?._id,{
+        $set:{
+            fullName,
+            email:email
+        }
+    },
+    {new :true}
+    ).select("-password")
+
+    return res
+            .status(200)
+            .json(new ApiResponse(200,user,"Account updated successfully"))
+})
+
+
+const updateAvatar=asyncHandler(async(req, res)=>{
+   const avatarLocalPath=req.file?.path;
+   if(!avatarLocalPath){
+    throw new ApiError(401,"Avatar fill missing ")
+   }
+
+   const avatar=uploadOnCloudinary(avatarLocalPath)
+
+   if(!avatar.url){
+    throw new ApiError(401,"Error while uploading avatar on cloudinary")
+   }
+
+   await User.findByIdAndUpdate(req.user?._id,{
+      $set:{
+        avatar:avatar.url
+      }
+   },{
+    new:true
+   }).select("-password")
+
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    channgeCurrentPassword,
+    updateAccountDetails
+    
 } 

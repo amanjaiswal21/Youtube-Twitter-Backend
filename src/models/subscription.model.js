@@ -11,6 +11,8 @@ channel:{
 }
 },{timestamps:true})
 
+
+
 const subscription=mongoose.model("Subscription", subscriptionSchema)
 
 export {subscription}
